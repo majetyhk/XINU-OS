@@ -1,0 +1,4 @@
+Please Note:
+This Demand Paging implementation uses internal data structures given in paging.h instead of the Queues recommended
+for the page replacement policies in the project specification document due to time constraints. Due to this,
+though the policies implemented are right, the order of the frames replaced might be different from the recommended approach.
