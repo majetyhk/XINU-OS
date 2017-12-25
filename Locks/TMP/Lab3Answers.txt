@@ -1,0 +1,72 @@
+Additional Questions
+
+Question 1
+
+The priority inversion problem could cause that a higher-priority process needs to wait for the completion of a lower-priority process. 
+
+Q i)Priority inheritance is one approach to address this issue. Please give another approach and briefly describe its idea.
+
+Answer i) Priority Ceiling and Random Boosting are the two approaches to resolve the issue of priority inheritance.
+
+In Priority Ceiling,  the shared mutex process (that runs the operating system code) has a characteristic (high) priority of its own, which is assigned to the task locking the mutex. This works well, provided the other high priority task(s) that tries to access the mutex does not have a priority higher than the ceiling priority.
+
+
+In Random Boosting, which is used in Microsoft Windows, Ready tasks holding locks are randomly boosted in priority until they exit the critical section.
+
+
+Answer ii)
+The test case consists of two processes A(priority 20) and C(Priority 40) trying to acquire a write lock in the same order(i.e. First A, then C) where as Process B(Priority 30) is just another process which is not using any locks. The output of the test case is as follows with locks and semaphores.
+
+--------------------Xinu Terminal Output ------------------------------
+[hmajety@bn18-73 compile](vmhost1)$ make run
+pcibios_init : PCI BIOS revision 2.10 entry at 0xfd482
+pci_init: PCI BIOS initialization succeeded
+
+
+Xinu Version (CSC501 1-2017 base) #1 (hmajety@bn18-73.dcs.mcnc.org) Sun Dec 3 16:44:54 EST 2017
+
+16777216 bytes real mem
+142863 bytes Xinu code
+clock enabled
+Priority Inversion with Locks
+
+Test 3: test the basic priority inheritence
+- Writer A. A(prio 20) granted the lock
+  A: acquired lock, 
+Writer A Priority before Writer C: 20
+-start writer C.(prio 40) blocked on the lock
+ A Priority after Writer C in wait: 40
+-start  B, then sleep 5s. B(prio 30) normally running
+A A A A A A A A A A A A A A A A A A A A A A A A A   A: released lock
+  C: acquired lock, 
+C C C C C C C C C C C C C C C C C C C C C C C C C   C: released lock
+B B B B B B B B B B B B B B B B B B B B B B B B B Completed test with locks.
+
+Priority Inversion with Semaphores
+
+Test 3: test the basic priority inheritence
+-start  A.  A(prio 20) granted the semaphore
+  A: to acquire semaphore
+ A Priority before Writer C: 20
+-start writer(prio 40) C blocked on the semaphore
+  C: to acquire semaphore
+ A Priority after Writer C in wait: 20
+-start  B.  B(prio 30) normally running
+B B B B B B B B B B B B B B B B B B B B B B B B B   A: acquired semaphore, 
+A A A A A A A A A A A A A A A A A A A A A A A A A   A: released semaphore
+  C: acquired semaphore, 
+C C C C C C C C C C C C C C C C C C C C C C C C C   C: released semaphore
+Completed test with Semaphores
+
+---------------------------------Xinu Terminal Output--------------------------
+
+With locks the Process A always finishes before B but in case of semaphores, SOMETIMES Process B finishes first which is not a desired outcome. 
+The screenshot of the output is in the TMP folder.
+
+Question 2
+
+Synchronization is a quite complex issue in operating systems. To show your understanding about process synchronization, you are asked to point out a reader/writer synchronization issue in this pesudo-code: task2_sync_issue.c. Multiple reader threads can execute this code concurrently by calling do_update. All the variables starting with global_ are global variables. You are asked to describe the potential issue caused by the incorrect synchronization and point out at least one possible thread interleaving that would trigger the problem.
+
+Answer: The main problem with the above code is the do_update function acquires the lock as reader lock and tries to perform a write operation. As the reader locks are not exclusive locks, if any other thread requests the reader lock, it will be granted to them as well. Due to this, though the output may not be in the expected order.
+
+For example, if reader1 and reader2 calls do_update() consecutively at time instants t1 and t2 where t1<t2, the expected output is string 't1t2'. But if reader1 acquires the lock and is rescheduled and reader2 acquires the lock and performs update without being rescheduled, then the output would be string 't2t1'. This is not the expected output. This is the incorrect synchronisation in the code given.

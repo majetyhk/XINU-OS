@@ -1,0 +1,29 @@
+Answer 1:
+
+
+Exponential Scheduling:
+
+Advantages of this policy is that the chances are of starvation of low priority processes(which is generally the case with most schedulers) is generally low since it is based on a random values generated out of a probability distribution. Also by changing the lambda value, the programmer has the flexibility to change the probability distribution for generation of random values according to his need.
+
+Disadvantages of this policy is that chances of starvation of high priority processes increases exponentially as the priority of process increases. In case there are processes with priorities as high as 95 along with processes with priorities around 75, the probability of processes with priority around 95 to be scheduled would be very very less. This might cause starvation. It is not a fair scheduler as the probability of choosing a process is not uniform.
+
+Priority Inversion: Exponential scheduling is a classical example of schedulers with which priority inversion can take place where a higher priority process is context switched with a lower priority process. Thus, the term priority loses it's meaning along with expected behaviour it should be having on the process scheduling.
+
+
+Linux-based Scheduling
+
+Advantages of this policy is that there is no randomization and there will be no starvation of any process as every process in the ready queue will be given CPU time in every EPOCH. Also this works based on goodness, a dynamic priority like parameter, which gives preference to the processes who haven't completely utilized their allocated CPU time in the previous EPOCH by allowing them to carry forward their left-over time quantum to current EPOCH. It is a fair scheduler.
+
+Disadvantage of this policy is it's complexity. Calculating the goodness values, quantum values and Re populating the queue after every EPOCH is resource consuming if there are large number of processes. This adds an additional overhead to the system.
+
+Xinu Scheduling
+
+Advantages of this policy are that it is a very simple scheduling mechanism with no much computations involved and it gives priority to processes with high priority.
+
+Disadvantages of this policy are that it causes starvation of low priority process if there is high priority process which doesn't yield CPU at all. It is not a fair scheduler. Though resched() is called after particular time quantum, it ultimately behaves as a non preemptive scheduler due to its bias towards always choosing a process with highest priority in the queue till it ends.
+
+
+Answer 2:
+In Exponential Scheduling, the NULL process is scheduled only if there are no processes in the ready queue. 
+In Linux-based scheduling, NULL process is only allowed to run in an EPOCH if there are no processes in the ready queue for that EPOCH.
+In Xinu scheduling, NULL process is scheduled only if there are no processes in ready queue.

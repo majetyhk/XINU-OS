@@ -1,0 +1,32 @@
+/* policy.c = srpolicy*/
+
+#include <conf.h>
+#include <kernel.h>
+#include <paging.h>
+
+
+extern int page_replace_policy;
+extern int debug_option;
+/*-------------------------------------------------------------------------
+ * srpolicy - set page replace policy 
+ *-------------------------------------------------------------------------
+ */
+SYSCALL srpolicy(int policy)
+{
+  /* sanity check ! */
+
+  //kprintf("To be implemented!\n");
+  page_replace_policy = policy;
+  debug_option=1;
+
+  return OK;
+}
+
+/*-------------------------------------------------------------------------
+ * grpolicy - get page replace policy 
+ *-------------------------------------------------------------------------
+ */
+SYSCALL grpolicy()
+{
+  return page_replace_policy;
+}
